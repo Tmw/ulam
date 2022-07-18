@@ -14,6 +14,7 @@ jobs:
 
     - name: Building WASM bundle
       run: make app
+      run: ls -la
 
     - name: Publish build
       uses: peaceiris/actions-gh-pages@v3
