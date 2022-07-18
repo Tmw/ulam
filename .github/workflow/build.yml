@@ -1,0 +1,24 @@
+name: Make WASM Build
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Install Emscripten
+      uses: lovasoa/setup-emscripten@master
+      with: 
+        emscripten-version: '3.1.14'
+
+    - name: Building WASM bundle
+      run: make app
+
+    - name: Publish build
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./
+
+
