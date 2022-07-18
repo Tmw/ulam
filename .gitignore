@@ -1,5 +1,4 @@
 # ignore output files
-index.html
 index.js
 index.wasm
 index.data

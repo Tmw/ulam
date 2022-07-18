@@ -1,21 +1,19 @@
 #include <SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <emscripten.h>
+#include <emscripten/html5.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
 #define MAX_STEPS 500
 #define STEP_SIZE 25
 #define NODE_RADIUS 8
+#define DRAW_SPEED 5
 #define NODE_COLOR {0xaa, 0xaa, 0xaa, 0xff}
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 800
-#define WINDOW_MID_X WINDOW_WIDTH/2
-#define WINDOW_MID_Y WINDOW_HEIGHT/2
-#define BLACK_COLOR {0x00, 0x00, 0x00, 0xff}
 
 SDL_Window* window;
 SDL_Renderer* renderer;
+int screen_width, screen_height, screen_mid_x, screen_mid_y;
 
 typedef enum MoveDirection {
   DIR_NORTH,
@@ -115,12 +113,21 @@ SDL_Point interpolate(SDL_Point point, MoveDirection direction, int progress) {
   }
 }
 
+void setup_sizing() {
+  double width, height;
+  emscripten_get_element_css_size("canvas", &width, &height);
+
+  screen_width = width;
+  screen_height = height;
+  screen_mid_x = screen_width / 2;
+  screen_mid_y = screen_height / 2;
+}
+
 int segment_progress = 0;
 int draw_step = 2;
 void draw_ulam_spiral() {
-  clear_screen();
 
-  SDL_Point last_point = {WINDOW_MID_X, WINDOW_MID_Y};
+  SDL_Point last_point = {screen_mid_x, screen_mid_y};
   MoveDirection direction = DIR_EAST;
   int steps_per_turn = 1;
 
@@ -130,7 +137,7 @@ void draw_ulam_spiral() {
     SDL_Point new_point = calculate_next_point(last_point, direction);
 
     if (i == draw_step && draw_step < MAX_STEPS) {
-      segment_progress+=5;
+      segment_progress+= DRAW_SPEED;
       new_point = interpolate(new_point, direction, segment_progress);
     }
 
@@ -139,10 +146,27 @@ void draw_ulam_spiral() {
       segment_progress = 0;
     }
 
-    thickLineRGBA(renderer, last_point.x, last_point.y, new_point.x, new_point.y, 2, 0x00, 0x00, 0x00, 0xff);
+    thickLineRGBA(
+      renderer, 
+      last_point.x, 
+      last_point.y, 
+      new_point.x, 
+      new_point.y, 
+      2, 
+      0x00, 
+      0x00, 
+      0x00, 
+      0xff
+    );
 
     if (is_prime(i)) {
-      aaFilledCircle(renderer, last_point.x, last_point.y, NODE_RADIUS, circle_color);
+      aaFilledCircle(
+        renderer, 
+        last_point.x, 
+        last_point.y, 
+        NODE_RADIUS, 
+        circle_color
+      );
     }
 
     if (i % steps_per_turn == 0) {
@@ -158,10 +182,33 @@ void draw_ulam_spiral() {
   SDL_RenderPresent(renderer);
 }
 
+void main_loop() {
+  clear_screen();
+
+  // handle events (only resizing for now)
+  SDL_Event event;
+  while (SDL_PollEvent(&event)) {
+    switch (event.type) {
+      case SDL_WINDOWEVENT:
+        if(event.window.event == SDL_WINDOWEVENT_RESIZED) {
+          setup_sizing();
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  draw_ulam_spiral();
+}
+
 int main(int argc, char* argv[]) {
+  setup_sizing();
+
   SDL_Init(SDL_INIT_VIDEO);
-  SDL_CreateWindowAndRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer);
+  SDL_CreateWindowAndRenderer(screen_width, screen_height, SDL_WINDOW_RESIZABLE, &window, &renderer);
   SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-  emscripten_set_main_loop(draw_ulam_spiral, 0, 1);
+  emscripten_set_main_loop(main_loop, 0, 1);
 }
