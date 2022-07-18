@@ -1,5 +1,5 @@
 app:
-	mkdir dist
+	mkdir -p dist
 	emcc main.c -o dist/index.js -s USE_SDL=2 -s USE_SDL_GFX=2
 	cp index.html dist/index.html
 
