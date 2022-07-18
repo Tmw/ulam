@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define MAX_STEPS 500
+#define MAX_STEPS 800
 #define STEP_SIZE 25
-#define NODE_RADIUS 8
+#define NODE_SIZE 16
 #define DRAW_SPEED 5
 #define NODE_COLOR {0xaa, 0xaa, 0xaa, 0xff}
 
@@ -27,16 +27,18 @@ void clear_screen() {
   SDL_RenderClear(renderer);
 }
 
-void aaFilledCircle(
+void draw_node(
     SDL_Renderer* renderer, 
     int posX, 
     int posY, 
-    int radius,
-    SDL_Color color
+    int size
 ) {
-    filledCircleRGBA(renderer, posX, posY, radius, color.r, color.g, color.b, color.a);
-    aaellipseRGBA(renderer, posX, posY, radius + 1, radius, color.r, color.g, color.b, color.a);
-    aacircleRGBA(renderer, posX, posY, radius, color.r, color.g, color.b, color.a);
+
+  SDL_Color color = NODE_COLOR;
+
+  SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+  SDL_Rect rect = {posX - size/2, posY - size/2, size, size};
+  SDL_RenderFillRect(renderer, &rect);
 }
 
 SDL_Point calculate_next_point(SDL_Point current_point, MoveDirection dir) {
@@ -131,7 +133,6 @@ void draw_ulam_spiral() {
   MoveDirection direction = DIR_EAST;
   int steps_per_turn = 1;
 
-  SDL_Color circle_color = NODE_COLOR;
 
   for (int i = 1; i <= draw_step; i++) {
     SDL_Point new_point = calculate_next_point(last_point, direction);
@@ -160,12 +161,11 @@ void draw_ulam_spiral() {
     );
 
     if (is_prime(i)) {
-      aaFilledCircle(
+      draw_node(
         renderer, 
         last_point.x, 
         last_point.y, 
-        NODE_RADIUS, 
-        circle_color
+        NODE_SIZE
       );
     }
 
