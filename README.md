@@ -26,7 +26,7 @@ building the source.
 <img src="assets/ulam.png" alt="ulam" />
 
 ## Demo
-tbd.
+See the [live demo here](https://tmw.github.io/ulam/).
 
 ## License
 [MIT](./LICENSE)
