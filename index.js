@@ -1722,8 +1722,8 @@ Module['asm'] = function(global, env, providedBuffer) {
   ;
   // import table
   env['table'] = wasmTable = new WebAssembly.Table({
-    'initial': 23296,
-    'maximum': 23296,
+    'initial': 25856,
+    'maximum': 25856,
     'element': 'anyfunc'
   });
   // With the wasm backend __memory_base and __table_base and only needed for
