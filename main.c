@@ -5,11 +5,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define MAX_STEPS 800
-#define STEP_SIZE 25
-#define NODE_SIZE 16
-#define DRAW_SPEED 5
 #define NODE_COLOR {0xaa, 0xaa, 0xaa, 0xff}
+size_t MAX_STEPS = 800;
+size_t STEP_SIZE = 25;
+size_t NODE_SIZE = 16;
+size_t DRAW_SPEED = 5;
+
+size_t segment_progress = 0;
+size_t draw_step = 2;
 
 SDL_Window* window;
 SDL_Renderer* renderer;
@@ -125,14 +128,10 @@ void setup_sizing() {
   screen_mid_y = screen_height / 2;
 }
 
-int segment_progress = 0;
-int draw_step = 2;
 void draw_ulam_spiral() {
-
   SDL_Point last_point = {screen_mid_x, screen_mid_y};
   MoveDirection direction = DIR_EAST;
   int steps_per_turn = 1;
-
 
   for (int i = 1; i <= draw_step; i++) {
     SDL_Point new_point = calculate_next_point(last_point, direction);
@@ -201,6 +200,17 @@ void main_loop() {
   }
 
   draw_ulam_spiral();
+}
+
+void reconfigure(size_t max_steps, size_t step_size, size_t node_size, size_t draw_speed) {
+  MAX_STEPS = max_steps;
+  STEP_SIZE = step_size;
+  NODE_SIZE = node_size;
+  DRAW_SPEED = draw_speed;
+
+  // reset progress
+  segment_progress = 0;
+  draw_step = 2;
 }
 
 int main(int argc, char* argv[]) {
