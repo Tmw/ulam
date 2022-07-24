@@ -1250,11 +1250,11 @@ function updateGlobalBufferViews() {
 
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 60816,
+    STACK_BASE = 60832,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 5303696,
-    DYNAMIC_BASE = 5303696,
-    DYNAMICTOP_PTR = 60784;
+    STACK_MAX = 5303712,
+    DYNAMIC_BASE = 5303712,
+    DYNAMICTOP_PTR = 60800;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1787,7 +1787,7 @@ function _emscripten_asm_const_iiii(code, a0, a1, a2) {
 
 
 
-// STATICTOP = STATIC_BASE + 59792;
+// STATICTOP = STATIC_BASE + 59808;
 /* global initializers */  __ATINIT__.push({ func: function() { ___emscripten_environ_constructor() } });
 
 
@@ -1798,7 +1798,7 @@ function _emscripten_asm_const_iiii(code, a0, a1, a2) {
 
 
 /* no memory initializer */
-var tempDoublePtr = 60800
+var tempDoublePtr = 60816
 assert(tempDoublePtr % 8 == 0);
 
 function copyTempFloat(ptr) { // functions, because inlining this code increases code size too much
@@ -9671,6 +9671,13 @@ asm["_memmove"] = function() {
   return real__memmove.apply(null, arguments);
 };
 
+var real__reconfigure = asm["_reconfigure"];
+asm["_reconfigure"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return real__reconfigure.apply(null, arguments);
+};
+
 var real__sbrk = asm["_sbrk"];
 asm["_sbrk"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
@@ -9789,6 +9796,12 @@ var _memset = Module["_memset"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["_memset"].apply(null, arguments)
+};
+
+var _reconfigure = Module["_reconfigure"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["_reconfigure"].apply(null, arguments)
 };
 
 var _sbrk = Module["_sbrk"] = function() {

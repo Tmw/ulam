@@ -15,6 +15,24 @@
         width: 100%;
         height: 100%;
       }
+      .controls {
+        position: absolute;
+        border: 1px solid #e1e1e1;
+        background-color: #fafafa;
+        border-radius: 10px;
+        padding: 30px;
+        top: 10px;
+        left: 10px;
+      }
+
+      .controls p {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .controls button {
+        width: 100%;
+      }
     </style>
   </head>
   <body>
@@ -26,7 +44,58 @@
       };
 
     </script>
+
     <script async type="text/javascript" src="index.js"></script>
+    <div class="controls">
+      <p>Max Steps <span id="max-steps-output"></span></p>
+      <input type="range" id="max-steps" min="50" max="5000" value="800" />
+
+      <p>Step Size <span id="step-size-output"></span></p>
+      <input type="range" id="step-size" min="1" max="100" value="25"/>
+
+      <p>Node Size <span id="node-size-output"></span></p>
+      <input type="range" id="node-size" min="4" max="50" value="16"/>
+
+      <p>Draw Speed <span id="draw-speed-output"></span></p>
+      <input type="range" id="draw-speed" min="1" max="9" value="5"/>
+
+      <p><button onClick="reconfigure()">Reset</button></p>
+    </div>
+
+    <script type="text/javascript">
+      function $(id) { return document.getElementById(id); };
+
+      function init() {
+        const controls = [
+          [$('max-steps'), $('max-steps-output')],
+          [$('step-size'), $('step-size-output')],
+          [$('node-size'), $('node-size-output')],
+          [$('draw-speed'), $('draw-speed-output')],
+        ];
+
+        controls.forEach( ([slider, output]) => {
+          // set initial value
+          output.innerHTML = slider.value;
+
+          // and setup change listener
+          slider.addEventListener('input', (e) => {
+            output.innerHTML = e.target.value;
+          });
+        });
+
+      }
+
+      function reconfigure() {
+        const maxSteps = $('max-steps').value;
+        const stepSize = $('step-size').value;
+        const nodeSize = $('node-size').value;
+        const drawSpeed = $('draw-speed').value;
+
+        _reconfigure(maxSteps, stepSize, nodeSize, drawSpeed);
+      }
+
+      init();
+    </script>
   </body>
 </html>
 
