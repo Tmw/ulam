@@ -2,7 +2,7 @@ name: Make WASM Build
 on: [push]
 
 env:
-  EM_VERSION: 1.38.40
+  EM_VERSION: 3.1.14
   EM_CACHE_FOLDER: 'emsdk-cache'
 
 jobs:
